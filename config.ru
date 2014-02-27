@@ -1,11 +1,5 @@
-class Forex
-  def call(env)
-    status = 200
-    headers = {"Content-Type" => "application/vnd.balanced.forex+json"}
-    body = %Q/{"hello" => "world"}/
+$:.unshift("lib")
 
-    [status, headers, [body]]
-  end
-end
+require 'forex'
 
 run Forex.new
