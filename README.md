@@ -6,7 +6,12 @@ To try it out:
 
 ```bash
 $ bundle
-$ rackup &
+$ rackup
+```
+
+Then, in another terminal:
+
+```
 $ curl http://localhost:9292/
 ```
 
