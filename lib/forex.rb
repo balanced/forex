@@ -2,6 +2,12 @@ require 'json'
 require 'coinbase_proxy'
 
 class Forex
+  attr_accessor :coinbase
+
+  def initialize
+    @coinbase = CoinbaseProxy.new
+  end
+  
   def call(env)
     headers = {"Content-Type" => "text/plain"}
     status = 404
@@ -38,11 +44,13 @@ class Forex
       raise UnsupportedCurrency
     end
 
+    value = coinbase.convert(from) * amount
+
     root_cj_document.tap do |doc|
       doc["collection"]["items"] = [{
         "data" => [
           "name" => "#{amount} #{from} in #{to}",
-          "value" => "0.001696",
+          "value" => "#{value}",
         ],
       }]
     end
@@ -77,4 +85,3 @@ class Forex
     }
   end
 end
-
