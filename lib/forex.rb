@@ -9,21 +9,23 @@ class Forex
   end
   
   def call(env)
-    headers = {"Content-Type" => "text/plain"}
+    headers = {"Content-Type" => "application/collection+json"}
     status = 404
-    body = 'Not found.'
+    body = {}
+    body["collection"] = {}
+    body["collection"]["error"] = {
+      "message" => "not found"
+    }
 
     if env["REQUEST_PATH"] == "/"
-      headers = {"Content-Type" => "application/collection+json"}
       status = 200
       body = root_cj_document
-      body = JSON.generate(body)
     elsif env["REQUEST_PATH"].start_with?("/convert")
-      headers = {"Content-Type" => "application/collection+json"}
       status = 200
       body = convert_cj_document(Rack::Utils.parse_query(env["QUERY_STRING"]))
-      body = JSON.generate(body)
     end
+
+    body = JSON.generate(body)
 
     [status, headers, [body]]
   rescue UnsupportedCurrency
