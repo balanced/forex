@@ -89,7 +89,7 @@ make an HTTP `GET` request to that URL, and you'll get another response back.
 Let's make that request:
 
 ```
-$ curl "http://localhost:9292/convert?from=usd&to=btc"
+$ curl "http://localhost:9292/convert?from=USD&to=BTC"
 {
   "collection": {
     "items": [
