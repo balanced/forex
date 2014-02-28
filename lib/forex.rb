@@ -1,4 +1,5 @@
 require 'json'
+require 'coinbase_proxy'
 
 class Forex
   def call(env)
@@ -14,20 +15,33 @@ class Forex
     elsif env["REQUEST_PATH"].start_with?("/convert")
       headers = {"Content-Type" => "application/collection+json"}
       status = 200
-      body = convert_cj_document(env["QUERY_STRING"])
+      body = convert_cj_document(Rack::Utils.parse_query(env["QUERY_STRING"]))
       body = JSON.generate(body)
     end
 
     [status, headers, [body]]
+  rescue UnsupportedCurrency
+    [400, {"Content-Type" => "text/plain"}, ["Currency not supported."]]
   end
 
   private
 
+  SUPPORTED_CURRENCIES = ["USD", "BTC"]
+  UnsupportedCurrency = Class.new(StandardError)
+
   def convert_cj_document(query)
+    to = query["to"]
+    from = query["from"]
+    amount = query.fetch("amount") { 1 }
+
+    unless SUPPORTED_CURRENCIES.include?(to) && SUPPORTED_CURRENCIES.include?(from)
+      raise UnsupportedCurrency
+    end
+
     root_cj_document.tap do |doc|
       doc["collection"]["items"] = [{
         "data" => [
-          "name" => "1 USD in BTC",
+          "name" => "#{amount} #{from} in #{to}",
           "value" => "0.001696",
         ],
       }]
